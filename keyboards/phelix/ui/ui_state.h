@@ -1,3 +1,6 @@
+// Copyright 2024 shawnfelix (@shawnfelix)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // enum of the WUI widget UI states
 typedef enum { MAX, MIN, HIDDEN } wui_ui_state_t;
 /*
