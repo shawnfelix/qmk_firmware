@@ -1,0 +1,1 @@
+#define WUI_POMODORO_ENABLED true
