@@ -90,8 +90,9 @@ void init_firmware_enabled_widgets_all(void) {
     //      key = enum value of the widget
     //      value = address of the wui element in the array
     // store the states as wui_gbl_state_t
-    pomo_wui_state_t pomo_state = (pomo_wui_state_t) { .init = false, .pomo_timer = 0, .pomodoro_state = 0 };
-    wui_gbl_state[WUI_POMODORO] = (wui_gbl_state_t) { .wui_init_state = NOT_INIT, .wui_ui_state = HIDDEN, .pomo_wui_state = pomo_state };
+
+    //pomo_wui_state_t pomo_state = (pomo_wui_state_t) { .init = false, .pomo_timer = 0, .pomodoro_state = 0 };
+    //wui_gbl_state[WUI_POMODORO] = (wui_gbl_state_t) { .wui_init_state = NOT_INIT, .wui_ui_state = HIDDEN, .pomo_wui_state = pomo_state };
 }
 
 void init_ui(void) {
@@ -163,32 +164,21 @@ void init_ui_action_button_bar(void) {
     lv_obj_align(btn_four_label, LV_ALIGN_LEFT_MID, 205, 0);
 
 }
-void init_widget_pomodoro(void) {
-    uprintf("init pomo\n");
-    lv_obj_t *pomodoro = lv_label_create(scr_home);
-    lv_label_set_text_fmt(pomodoro, "%02d:%02d:%02d", 0, 0, 0);
-    lv_obj_set_style_text_color(pomodoro, THEME_TEXT_LIGHT, LV_PART_MAIN);
-    lv_obj_set_style_text_font(pomodoro, &lv_font_montserrat_38, LV_PART_MAIN);
-    lv_obj_align(pomodoro, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_fade_in(pomodoro, 400, 100);
-    wui_gbl_state[WUI_POMODORO].pomo_wui_state = (pomo_wui_state_t){.pomo_timer = 0, .pomodoro_state= 0, .pomo_label = pomodoro};
-}
 
 /* OK, Yes, or Continue button in the UI. Affirmative ui event */
 void ui_btn_event_one(void) {
-    init_widget_pomodoro();
+    init_widget_pomodoro(scr_home, THEME_TEXT_LIGHT);
 }
 /* Up or Alt Modifier 1 button in the UI */
 void ui_btn_event_two(void) {
-    start_pomodoro();
 }
 /* Down or Alt M button in the UI */
 void ui_btn_event_three(void) {
-    reset_pomodoro();
+    start_pomodoro();
 }
 /* Cancel, Back, or No button in the UI. Negative action */
 void ui_btn_event_four(void) {
-
+    reset_pomodoro();
 }
 /*
 example from discord:
