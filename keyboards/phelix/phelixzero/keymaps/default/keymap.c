@@ -9,6 +9,11 @@ enum custom_layer {
     _UI_CONTROL
 };
 
+char* custom_layer_label[] =  {
+    [_DEFAULT]="DEFAULT",
+    [_UI_CONTROL]="UI_CONTROL"
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
     +--------+------+------+------+------+------+------+      +------+------+------+------+------+------+-------------+
@@ -25,12 +30,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     */
     [_DEFAULT] = LAYOUT(
-        KC_ESC,  KC_1,  KC_2,    KC_3,    KC_4,     KC_5,   KC_6,       KC_7,   KC_8, KC_9,    KC_0,   KC_MINS, KC_EQL,  KC_BSPC,
-        KC_TAB,  KC_Q,  KC_W,    KC_E,    KC_R,     KC_T,               KC_Y,   KC_U, KC_I,    KC_O,   KC_P,    KC_LBRC, KC_RBRC,   KC_BSLS,
-        KC_LCTL, KC_A,  KC_S,    KC_D,    KC_F,     KC_G,               KC_H,   KC_J, KC_K,    KC_L,   KC_SCLN, KC_QUOT, KC_ENT,
-        KC_LSFT, KC_Z,  KC_X,    KC_C,    KC_V,     KC_B,               KC_N,   KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, KC_UP,     KC_DEL,
-        KC_LCTL, KC_7,  KC_NO,   KC_LALT, KC_SPC,                     KC_SPC, TO(1), QK_BOOT, KC_9,   KC_LEFT, KC_DOWN, KC_RGHT,
-        KC_NO,                                                          PB_1,   PB_2, PB_3,    PB_4,   PB_5
+        QK_GESC, KC_1,    KC_2,    KC_3,    KC_4,     KC_5,   KC_6,       KC_7,   KC_8,  KC_9,    KC_0,   KC_MINS, KC_EQL,  KC_BSPC,
+        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,     KC_T,               KC_Y,   KC_U,  KC_I,    KC_O,   KC_P,    KC_LBRC, KC_RBRC,   KC_BSLS,
+        KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,     KC_G,               KC_H,   KC_J,  KC_K,    KC_L,   KC_SCLN, KC_QUOT, KC_ENT,
+        KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,     KC_B,               KC_N,   KC_M,  KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, KC_UP,     KC_DEL,
+        KC_LCTL, KC_LGUI, KC_NO,   KC_LALT, KC_SPC,                       KC_SPC, MO(_UI_CONTROL), KC_RALT, MO(_UI_CONTROL),  KC_LEFT, KC_DOWN, KC_RGHT,
+        KC_NO,                                                            PB_1,   PB_2,  PB_3,    PB_4,   PB_5
     ),
     /*
     +--------+------+------+------+------+------+------+      +------+------+------+------+------+------+-------------+
@@ -58,11 +63,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     '------'  '-----'-------------   ----------'------'  '------'
     */
     [_UI_CONTROL] = LAYOUT(
-        KC_NO, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_NO, UI_J,  UI_K,  UI_L,  KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO,   QK_BOOT,   KC_NO,    KC_NO,                 KC_NO, TO(0), KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_TILD, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO,   KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO,   UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_NO, UI_J,  UI_K,  UI_L,  KC_NO, KC_NO, KC_NO,
+        KC_NO,   KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO,   KC_NO,   QK_BOOT, KC_NO,    KC_NO,                 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,                                                      PB_1,   PB_2, PB_3,    PB_4,   PB_5
     )
 };
@@ -103,4 +108,24 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return true;
     }
     return true;
+}
+
+/* runs ever time layer gets changed */
+layer_state_t layer_state_set_user(layer_state_t state) {
+    uint8_t current_layer = get_highest_layer(state);
+    switch (current_layer) {
+        case 0:
+            update_ui_layer_state("Default");
+            break;
+        case 1:
+            update_ui_layer_state("UI Control");
+            break;
+        default: {
+            char c[11];
+            sprintf(c, "%x", state);
+            update_ui_layer_state(c);
+            break;
+        }
+    }
+    return state;
 }
