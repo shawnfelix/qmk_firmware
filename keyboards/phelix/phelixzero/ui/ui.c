@@ -63,6 +63,7 @@ void init_clock(lv_obj_t *screen, uint32_t time_offset) {
 
 // wui_gbl_state_t stores the state of all WUI widgets
 wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
+gbl_ui_state_t gbl_ui_state;
 //deferred_token pomodoro_timer_start_token;
 
 void set_gbl_wui_ui_state(wui_t wui_enum, wui_ui_state_t state) {
@@ -76,16 +77,22 @@ void set_gbl_wui(wui_t wui_enum, wui_init_state_t init_state, wui_ui_state_t ui_
     set_gbl_wui_ui_state(wui_enum, ui_state);
 }
 
-// runs one time on keyboard startup to enable all of the widgets
+/*
+    Runs one time on keyboard startup to init global state
+    and enable all of the widgets
+*/
 void init_firmware_enabled_widgets_all(void) {
+    // init global state
+    gbl_ui_state = (gbl_ui_state_t) { .active_layer_text="uninitialized", NULL, false, ""};
     // init the list of enabled wuis and get the count
     // create an array of wui_gbl_state_t for each enabled wui
     // create map where:
     //      key = enum value of the widget
     //      value = address of the wui element in the array
     // store the states as wui_gbl_state_t
-    pomo_wui_state_t pomo_state = (pomo_wui_state_t) { .init = false, .pomo_timer = 0, .pomodoro_state = 0 };
-    wui_gbl_state[WUI_POMODORO] = (wui_gbl_state_t) { .wui_init_state = NOT_INIT, .wui_ui_state = HIDDEN, .pomo_wui_state = pomo_state };
+
+    //pomo_wui_state_t pomo_state = (pomo_wui_state_t) { .init = false, .pomo_timer = 0, .pomodoro_state = 0 };
+    //wui_gbl_state[WUI_POMODORO] = (wui_gbl_state_t) { .wui_init_state = NOT_INIT, .wui_ui_state = HIDDEN, .pomo_wui_state = pomo_state };
 }
 
 void init_ui(void) {
@@ -157,32 +164,22 @@ void init_ui_action_button_bar(void) {
     lv_obj_align(btn_four_label, LV_ALIGN_LEFT_MID, 205, 0);
 
 }
-void init_widget_pomodoro(void) {
-    uprintf("init pomo\n");
-    lv_obj_t *pomodoro = lv_label_create(scr_home);
-    lv_label_set_text_fmt(pomodoro, "%02d:%02d:%02d", 0, 0, 0);
-    lv_obj_set_style_text_color(pomodoro, THEME_TEXT_LIGHT, LV_PART_MAIN);
-    lv_obj_set_style_text_font(pomodoro, &lv_font_montserrat_38, LV_PART_MAIN);
-    lv_obj_align(pomodoro, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_fade_in(pomodoro, 400, 100);
-    wui_gbl_state[WUI_POMODORO].pomo_wui_state = (pomo_wui_state_t){.pomo_timer = 0, .pomodoro_state= 0, .pomo_label = pomodoro};
-}
 
 /* OK, Yes, or Continue button in the UI. Affirmative ui event */
 void ui_btn_event_one(void) {
-    init_widget_pomodoro();
+    init_widget_pomodoro(scr_home, THEME_TEXT_LIGHT);
 }
 /* Up or Alt Modifier 1 button in the UI */
 void ui_btn_event_two(void) {
-    start_pomodoro();
+    pause_pomodoro();
 }
 /* Down or Alt M button in the UI */
 void ui_btn_event_three(void) {
-    reset_pomodoro();
+    start_pomodoro();
 }
 /* Cancel, Back, or No button in the UI. Negative action */
 void ui_btn_event_four(void) {
-
+    reset_pomodoro();
 }
 /*
 example from discord:
@@ -209,6 +206,25 @@ uint32_t render_gif_wpm(uint32_t trigger_time, void *cb_arg) {
 }
 */
 
+
+void update_layer_state_text(void) {
+    if (gbl_ui_state.active_layer_obj != NULL) {
+        lv_label_set_text_fmt(gbl_ui_state.active_layer_obj, "Layer: %s", gbl_ui_state.active_layer_text);
+    }
+}
+void update_ui_layer_state(char layer_name_text[]) {
+    strcpy(gbl_ui_state.active_layer_text, layer_name_text);
+    update_layer_state_text();
+}
+void init_ui_layer_state(void) {
+    gbl_ui_state.active_layer_obj = lv_label_create(scr_home);
+    lv_obj_set_style_text_color(gbl_ui_state.active_layer_obj, THEME_TEXT_LIGHT, LV_PART_MAIN);
+    lv_obj_set_style_text_font(gbl_ui_state.active_layer_obj, &lv_font_montserrat_14, LV_PART_MAIN);
+    lv_obj_align(gbl_ui_state.active_layer_obj, LV_ALIGN_TOP_LEFT, 10, 5);
+    update_layer_state_text();
+}
+
+
 void read_timer(void) {
     //int i = 0;
     //set_label_clock_time(pomo_state.pomodoro, pomopomo_timer);
@@ -220,8 +236,9 @@ void init_screen_home(void) {
     lv_obj_set_style_bg_color(scr_home, THEME_PRIMARY_BG, LV_PART_MAIN);
     init_clock(scr_home, 3500);
     init_ui_action_button_bar();
-    lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
+    init_ui_layer_state();
 
+    lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
 }
 static void anim_x_cb(void * var, int32_t v) {
     lv_obj_set_x(var, v);
@@ -299,3 +316,5 @@ bool init_display(void) {
     }
     return true;
 }
+
+
