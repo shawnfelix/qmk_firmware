@@ -3,6 +3,8 @@
 
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
+#include "ui/ui_state.h"
+#include "globals.h"
 
 enum custom_layer {
     _DEFAULT,
@@ -66,7 +68,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TILD, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_NO, UI_J,  UI_K,  UI_L,  KC_NO, KC_NO, KC_NO,
-        KC_NO,   KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO,   KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_6, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   QK_BOOT, KC_NO,    KC_NO,                 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,                                                      PB_1,   PB_2, PB_3,    PB_4,   PB_5
     )
@@ -78,7 +80,11 @@ void keyboard_post_init_kb(void) {
 }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+    if (gbl_ui_state.cli_mode_active == true){
+
+    }
     switch (keycode) {
+        case PB_6:
         case PB_1:
             if (record-> event.pressed) {
                 ui_btn_event_one();

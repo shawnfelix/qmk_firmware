@@ -12,13 +12,19 @@ typedef enum { NOT_INIT, INIT, IDLE, RUNNING } wui_init_state_t;
 typedef struct {
     char active_layer_text[20];
     lv_obj_t *active_layer_obj;
+    bool cli_mode_active;
+    char cli_buffer[100];
 } gbl_ui_state_t;
 
+typedef enum {
+    POMO_RUNNING,
+    POMO_PAUSED,
+    POMO_STOPPED
+} pomo_state_t;
 
 typedef struct {
-    bool init;
     uint32_t pomo_timer;
-    uint8_t pomodoro_state;
+    pomo_state_t pomo_state;
     lv_obj_t *pomo_label;
     deferred_token token;
 } pomo_wui_state_t;

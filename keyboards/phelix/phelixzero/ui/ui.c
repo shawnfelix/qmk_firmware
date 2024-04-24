@@ -83,7 +83,7 @@ void set_gbl_wui(wui_t wui_enum, wui_init_state_t init_state, wui_ui_state_t ui_
 */
 void init_firmware_enabled_widgets_all(void) {
     // init global state
-    gbl_ui_state = (gbl_ui_state_t) { .active_layer_text="uninitialized", NULL };
+    gbl_ui_state = (gbl_ui_state_t) { .active_layer_text="uninitialized", NULL, false, ""};
     // init the list of enabled wuis and get the count
     // create an array of wui_gbl_state_t for each enabled wui
     // create map where:
@@ -171,6 +171,7 @@ void ui_btn_event_one(void) {
 }
 /* Up or Alt Modifier 1 button in the UI */
 void ui_btn_event_two(void) {
+    pause_pomodoro();
 }
 /* Down or Alt M button in the UI */
 void ui_btn_event_three(void) {
