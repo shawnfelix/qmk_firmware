@@ -5,14 +5,19 @@ QUANTUM_PAINTER_LVGL_INTEGRATION = yes
 MCU = RP2040
 #SPLIT_KEYBOARD = yes
 SERIAL_DRIVER = vendor
+
+#for debug mode
 CONSOLE_ENABLE = yes
+DEBUG_ENABLE = yes
+
 DEFERRED_EXEC_ENABLE = yes
 
 VPATH += keyboards/phelix/phelixzero/ui \
 		 keyboards/phelix/phelixzero/ui/features
 
 SRC += ui.c \
-	   pomodoro.c
+	   pomodoro.c \
+	   ui_cli.c
 
 
 # Fix LVGL opcode compile issue on RP2040

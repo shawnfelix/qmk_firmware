@@ -4,7 +4,10 @@
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
 #include "ui/ui_state.h"
+#include "ui/features/ui_cli.h"
 #include "globals.h"
+#include "print.h"
+#include <debug.h>
 
 enum custom_layer {
     _DEFAULT,
@@ -68,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TILD, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_NO, UI_J,  UI_K,  UI_L,  KC_NO, KC_NO, KC_NO,
-        KC_NO,   KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_6, KC_NO, KC_NO, KC_NO,
+        KC_NO,   DB_TOGG,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_6, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   QK_BOOT, KC_NO,    KC_NO,                 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,                                                      PB_1,   PB_2, PB_3,    PB_4,   PB_5
     )
@@ -79,12 +82,47 @@ void keyboard_post_init_kb(void) {
     display_enabled = init_display();
 }
 
+void keyboard_post_init_user(void) {
+    debug_enable = true;
+}
+const char keycode_to_char_lookup_2[] = {
+    '\0', '\0', '\0', '\0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1',
+    '2', '3', '4', '5', '6', '7', '8', '9', '0', '\n', '\0', '\0', '\0', ' ' // <- KC_SPC
+    // Add more characters as needed
+};
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    if (gbl_ui_state.cli_mode_active == true){
-
+    if (gbl_ui_state.cli_mode_active == true && record-> event.pressed) {
+        uprintf("[UI CLI MODE] Keycode: 0x%04X\n", keycode);
+        switch(keycode) {
+            case QK_GESC:
+                ui_cli_do_action(CLI_CLOSE);
+                return false;
+            break;
+            case KC_ENT:
+                ui_cli_do_action(CLI_SUBMIT);
+                return false;
+            break;
+            case KC_BSPC:
+                ui_cli_do_action(CLI_BSPC);
+                return false;
+            break;
+            case KC_LEFT:
+                ui_cli_do_action(CLI_LEFT);
+                return false;
+            case KC_RIGHT:
+                ui_cli_do_action(CLI_RIGHT);
+                return false;
+            default:
+                lv_textarea_add_char(gbl_ui_state.cli_ta, keycode_to_char_lookup_2[keycode]);
+            break;
+        }
+        return false;
     }
     switch (keycode) {
         case PB_6:
+            ui_cli_do_action(CLI_OPEN);
+            return false;
         case PB_1:
             if (record-> event.pressed) {
                 ui_btn_event_one();
@@ -128,7 +166,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             break;
         default: {
             char c[11];
-            sprintf(c, "%x", state);
+            sprintf(c, "%x", state);// inefficient but whatever for now
             update_ui_layer_state(c);
             break;
         }

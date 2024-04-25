@@ -14,6 +14,7 @@ typedef struct {
     lv_obj_t *active_layer_obj;
     bool cli_mode_active;
     char cli_buffer[100];
+    lv_obj_t *cli_ta;
 } gbl_ui_state_t;
 
 typedef enum {
