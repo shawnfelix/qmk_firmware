@@ -5,6 +5,8 @@
 #include "qp_lvgl.h"
 #include "qp_st7789.h"
 #include "features/pomodoro.h"
+#include "features/ui_cli.h"
+#include "features/features.h"
 #include "ui_state.h"
 
 static const uint16_t D_PHYSICAL_X = 172;
@@ -206,7 +208,6 @@ uint32_t render_gif_wpm(uint32_t trigger_time, void *cb_arg) {
 }
 */
 
-
 void update_layer_state_text(void) {
     if (gbl_ui_state.active_layer_obj != NULL) {
         lv_label_set_text_fmt(gbl_ui_state.active_layer_obj, "Layer: %s", gbl_ui_state.active_layer_text);
@@ -224,7 +225,6 @@ void init_ui_layer_state(void) {
     update_layer_state_text();
 }
 
-
 void read_timer(void) {
     //int i = 0;
     //set_label_clock_time(pomo_state.pomodoro, pomopomo_timer);
@@ -234,9 +234,11 @@ void read_timer(void) {
 void init_screen_home(void) {
     scr_home = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(scr_home, THEME_PRIMARY_BG, LV_PART_MAIN);
+
     init_clock(scr_home, 3500);
     init_ui_action_button_bar();
     init_ui_layer_state();
+    init_ui_cli(scr_home);
 
     lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
 }
