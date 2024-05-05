@@ -71,12 +71,44 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TILD, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_NO, UI_J,  UI_K,  UI_L,  KC_NO, KC_NO, KC_NO,
-        KC_NO,   DB_TOGG,   KC_NO,   KC_NO,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_6, KC_NO, KC_NO, KC_NO,
+        KC_NO,   DB_TOGG,   KC_VOLU,   KC_VOLD,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_6, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   QK_BOOT, KC_NO,    KC_NO,                 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,                                                      PB_1,   PB_2, PB_3,    PB_4,   PB_5
     )
 };
 
+// encoder map
+
+/*
+const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
+    [_DEFAULT] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [_UI_CONTROL]  = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)}
+};
+*/
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    uprintf("[encoder]: %s \n", clockwise ? "CW" : "C_CW");
+    if (clockwise) {
+        tap_code(KC_VOLU);
+    } else {
+        tap_code(KC_VOLD);
+    }
+    return false;
+    /*if (index == 0) { // First encoder
+        if (clockwise) {
+            tap_code(KC_PGDN);
+        } else {
+            tap_code(KC_PGUP);
+        }
+    } else if (index == 1) { // Second encoder
+        if (clockwise) {
+            tap_code(KC_PGDN);
+        } else {
+            tap_code(KC_PGUP);
+        }
+    }
+    return false;
+*/
+}
 static bool display_enabled = false;
 void keyboard_post_init_kb(void) {
     display_enabled = init_display();
