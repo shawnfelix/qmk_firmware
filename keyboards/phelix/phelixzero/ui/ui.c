@@ -31,6 +31,7 @@ lv_color_t THEME_BUTTON_4;
 static lv_obj_t *scr_startup;
 static lv_obj_t *scr_home;
 lv_obj_t wpm_counter_widget;
+LV_FONT_DECLARE(hooskai_font_36);
 
 // TODO move this to a config file optional
 void init_theme_colors(void) {
@@ -120,7 +121,15 @@ void init_ui_action_button_bar(void) {
     lv_obj_align(action_button_bar, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_set_scrollbar_mode(action_button_bar , LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_bg_color(action_button_bar, THEME_SECONDARY_BG, 0);
+    lv_obj_set_style_border_color(action_button_bar, THEME_TEXT_LIGHT, 0);
 
+/*
+    lv_style_t style_action_btn;
+    lv_style_init(&style_action_btn);
+    lv_style_set_size(&style_action_btn, 20);
+    lv_style_set_radius(&style_action_btn, )
+    lv_obj_set_style_radius(led_one , LV_RADIUS_CIRCLE, 0);
+*/
     lv_obj_t *led_one = lv_obj_create(action_button_bar);
     lv_obj_set_scrollbar_mode(led_one , LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_size(led_one , 20, 20);
@@ -257,9 +266,9 @@ void init_screen_startup(void) {
     lv_scr_load_anim(scr_startup, LV_SCR_LOAD_ANIM_FADE_ON, 500, 1000, false);
 
     lv_obj_t *phelix_text = lv_label_create(scr_startup);
-    lv_label_set_text(phelix_text, "phelix\nkeyboards");
+    lv_label_set_text(phelix_text, "PHELIX\nKEYBOARDS");
     lv_obj_set_style_text_color(phelix_text, THEME_ACCENT, LV_PART_MAIN);
-    lv_obj_set_style_text_font(phelix_text, &lv_font_montserrat_48, LV_PART_MAIN);
+    lv_obj_set_style_text_font(phelix_text, &hooskai_font_36, LV_PART_MAIN);
     lv_obj_align(phelix_text, LV_ALIGN_CENTER, 0, 0);
 
     lv_obj_t *underline_text = lv_label_create(scr_startup);
