@@ -5,6 +5,7 @@
 #include "qp_lvgl.h"
 #include "qp_st7789.h"
 #include "features/pomodoro.h"
+#include "features/pk_wpm.h"
 #include "features/ui_cli.h"
 #include "features/features.h"
 #include "ui_state.h"
@@ -190,7 +191,8 @@ void ui_btn_event_three(void) {
 }
 /* Cancel, Back, or No button in the UI. Negative action */
 void ui_btn_event_four(void) {
-    reset_pomodoro();
+    //reset_pomodoro();
+    init_widget_wpm(scr_home, THEME_TEXT_LIGHT);
 }
 /*
 example from discord:

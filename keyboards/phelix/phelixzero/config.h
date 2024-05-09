@@ -33,7 +33,7 @@
 #define LCD_RST_PIN GP8
 #define LCD_DC_PIN GP4
 #define LCD_CS_PIN GP5
-#define LCD_SPI_DIVISOR 8
+#define LCD_SPI_DIVISOR 2
 
 
 

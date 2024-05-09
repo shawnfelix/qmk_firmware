@@ -30,6 +30,12 @@ typedef struct {
     deferred_token token;
 } pomo_wui_state_t;
 
+typedef struct {
+    uint8_t last_wpm;
+    lv_obj_t *wpm_label;
+    deferred_token token;
+} wpm_wui_state_t;
+
 // wrapper common type for the state of a WUI widget,
 typedef struct {
     wui_init_state_t wui_init_state;
@@ -37,11 +43,13 @@ typedef struct {
     union {
         // add other widgets here
         pomo_wui_state_t pomo_wui_state;
+        wpm_wui_state_t wpm_wui_state;
     };
 } wui_gbl_state_t;
 
 // enum of all WUI widgets that are developed for phelix keyboards
 typedef enum {
     WUI_POMODORO,
+    WUI_WPM,
     NumberOfWuiTypes
 } wui_t;

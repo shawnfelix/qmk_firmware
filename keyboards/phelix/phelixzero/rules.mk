@@ -10,7 +10,7 @@ CONSOLE_ENABLE = yes
 DEBUG_ENABLE = yes
 
 DEFERRED_EXEC_ENABLE = yes
-
+WPM_ENABLE = yes
 
 EXTRAKEY_ENABLE = yes #enable media controls
 
@@ -19,6 +19,7 @@ VPATH += keyboards/phelix/phelixzero/ui \
 
 SRC += ui.c \
 	   pomodoro.c \
+	   pk_wpm.c \
 	   ui_cli.c \
        ui/fonts/hooskai_font_36.c
 
