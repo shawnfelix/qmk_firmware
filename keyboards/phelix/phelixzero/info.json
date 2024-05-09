@@ -16,9 +16,6 @@
     },
     "split": {
         "enabled": true,
-        "usb_detect": {
-            "enabled": true
-        },
         "matrix_pins": {
             "right": {
                 "cols": ["GP21", "GP23", "GP20", "GP22", "GP26", "GP27", "GP28", "GP29"],
