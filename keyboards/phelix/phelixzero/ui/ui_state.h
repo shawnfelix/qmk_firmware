@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // enum of the WUI widget UI states
-typedef enum { MAX, MIN, HIDDEN } wui_ui_state_t;
+typedef enum { MAX, MIN, HIDDEN } window_state_t;
 /*
 enum of all WUI widget program states
 state transitions: NOT_INIT -> INIT -> IDLE <-> RUNNING
@@ -24,6 +24,7 @@ typedef enum {
 } pomo_state_t;
 
 typedef struct {
+    window_state_t ui_state;
     uint32_t pomo_timer;
     pomo_state_t pomo_state;
     lv_obj_t *pomo_label;
@@ -39,7 +40,7 @@ typedef struct {
 // wrapper common type for the state of a WUI widget,
 typedef struct {
     wui_init_state_t wui_init_state;
-    wui_ui_state_t wui_ui_state;
+    window_state_t window_state;
     union {
         // add other widgets here
         pomo_wui_state_t pomo_wui_state;

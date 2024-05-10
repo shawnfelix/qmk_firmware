@@ -107,15 +107,17 @@ static void scroll_event_cb(lv_event_t * e)
 /**
  * Translate the object as they scroll
  */
-void lv_example_scroll_6(void)
+void show_ui_widget_selector(void)
 {
     cont = lv_obj_create(scr_home);
-    lv_obj_set_size(cont, 150, 150);
+    lv_obj_set_size(cont, 172, 150);
+    lv_obj_set_style_bg_opa(cont, 0, 0);
+    lv_obj_set_style_border_width(cont, 0, 0);
     lv_obj_center(cont);
     lv_obj_align(cont, LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_add_event_cb(cont, scroll_event_cb, LV_EVENT_SCROLL, NULL);
-    lv_obj_set_style_radius(cont, LV_RADIUS_CIRCLE, 0);
+    //lv_obj_set_style_radius(cont, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(cont, true, 0);
     lv_obj_set_scroll_dir(cont, LV_DIR_VER);
     lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
@@ -125,6 +127,7 @@ void lv_example_scroll_6(void)
     for(i = 0; i < NumberOfWuiTypes; i++) {
         lv_obj_t * btn = lv_btn_create(cont);
         lv_obj_set_width(btn, lv_pct(100));
+        lv_obj_set_style_bg_color(btn, THEME_TEXT_DARK, 0);
 
         lv_obj_t * label = lv_label_create(btn);
 //        lv_label_set_text_fmt(label, "Button %"LV_PRIu32, i);
@@ -156,15 +159,11 @@ wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
 gbl_ui_state_t gbl_ui_state;
 //deferred_token pomodoro_timer_start_token;
 
-void set_gbl_wui_ui_state(wui_t wui_enum, wui_ui_state_t state) {
-    wui_gbl_state[wui_enum].wui_ui_state = state;
+void set_wui_window_state(wui_t wui_enum, window_state_t state) {
+    wui_gbl_state[wui_enum].window_state = state;
 }
-void set_gbl_wui_init_state(wui_t wui_enum, wui_init_state_t state) {
-    wui_gbl_state[wui_enum].wui_init_state = state;
-}
-void set_gbl_wui(wui_t wui_enum, wui_init_state_t init_state, wui_ui_state_t ui_state) {
-    set_gbl_wui_init_state(wui_enum, init_state);
-    set_gbl_wui_ui_state(wui_enum, ui_state);
+void set_gbl_wui(wui_t wui_enum, window_state_t init_state, window_state_t ui_state) {
+    set_wui_window_state(wui_enum, ui_state);
 }
 
 /*
@@ -273,6 +272,9 @@ void ui_btn_event_four(void) {
     //reset_pomodoro();
     init_widget_wpm(scr_home, THEME_TEXT_LIGHT);
 }
+void ui_encoder_switch(void) {
+    show_ui_widget_selector();
+}
 void ui_encoder_up(void) {
     if (current_scroll_pos > 0) {
         current_scroll_pos = current_scroll_pos -1;
@@ -345,7 +347,6 @@ void init_screen_home(void) {
     init_ui_cli(scr_home);
 
     lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
-    lv_example_scroll_6();
 }
 
 void init_screen_startup(void) {

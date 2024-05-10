@@ -36,7 +36,7 @@ void init_widget_wpm(lv_obj_t *scr_home, lv_color_t text_color) {
 
 
         wui_gbl_state[WUI_WPM].wpm_wui_state.token = defer_exec(500, update_wpm_callback, &wui_gbl_state[WUI_WPM]);
-        wui_gbl_state[WUI_WPM].wui_ui_state = RUNNING;
+        //wui_gbl_state[WUI_WPM].wui_ui_state = RUNNING;
     }
 }
 
