@@ -60,10 +60,6 @@ void init_clock(lv_obj_t *screen, uint32_t time_offset) {
     lv_obj_fade_in(clock, 400, time_offset + 1000);
 }
 
-/*void init_wpm_widget(lv_obj_t *screen) {
-    wpm_counter_widget = lv_label_create(screen);
-
-}*/
 
 // wui_gbl_state_t stores the state of all WUI widgets
 wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
@@ -124,13 +120,6 @@ void init_ui_action_button_bar(void) {
     lv_obj_set_style_bg_color(action_button_bar, THEME_SECONDARY_BG, 0);
     lv_obj_set_style_border_color(action_button_bar, THEME_TEXT_LIGHT, 0);
 
-/*
-    lv_style_t style_action_btn;
-    lv_style_init(&style_action_btn);
-    lv_style_set_size(&style_action_btn, 20);
-    lv_style_set_radius(&style_action_btn, )
-    lv_obj_set_style_radius(led_one , LV_RADIUS_CIRCLE, 0);
-*/
     lv_obj_t *led_one = lv_obj_create(action_button_bar);
     lv_obj_set_scrollbar_mode(led_one , LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_size(led_one , 20, 20);
@@ -253,16 +242,12 @@ void init_screen_home(void) {
 
     lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
 }
-static void anim_x_cb(void * var, int32_t v) {
-    lv_obj_set_x(var, v);
-}
 
 void init_screen_startup(void) {
     lv_disp_set_bg_color(lv_disp_get_default(), lv_color_black());
     // create screen
     scr_startup = lv_scr_act();
     lv_obj_set_scrollbar_mode(scr_startup, LV_SCROLLBAR_MODE_OFF);
-
     lv_obj_set_style_bg_color(scr_startup, THEME_SECONDARY_BG, LV_PART_MAIN);
 
     lv_scr_load_anim(scr_startup, LV_SCR_LOAD_ANIM_FADE_ON, 500, 1000, false);
@@ -273,25 +258,42 @@ void init_screen_startup(void) {
     lv_obj_set_style_text_font(phelix_text, &hooskai_font_36, LV_PART_MAIN);
     lv_obj_align(phelix_text, LV_ALIGN_CENTER, 0, 0);
 
-    lv_obj_t *underline_text = lv_label_create(scr_startup);
+    /*lv_obj_t *underline_text = lv_label_create(scr_startup);
     lv_label_set_text(underline_text, "...");
     lv_obj_set_style_text_color(underline_text, THEME_TEXT_LIGHT, LV_PART_MAIN);
     lv_obj_set_style_text_font(underline_text, &lv_font_montserrat_38, LV_PART_MAIN);
     lv_obj_align(underline_text, LV_ALIGN_CENTER, 0, 50);
+    */
+    static lv_style_t style_bg;
+    static lv_style_t style_indic;
+    lv_style_init(&style_bg);
+    lv_style_set_border_color(&style_bg, THEME_ACCENT);
+    lv_style_set_border_width(&style_bg, 2);
+    //lv_style_set_pad_all(&style_bg, 6);
+    lv_style_set_radius(&style_bg, 10);
+    lv_style_set_anim_time(&style_bg, 2000);
 
+    lv_style_init(&style_indic);
+    lv_style_set_bg_opa(&style_indic, LV_OPA_COVER);
+    lv_style_set_bg_color(&style_indic, THEME_ACCENT);
+    lv_style_set_radius(&style_indic, 3);
 
-    lv_obj_fade_in(phelix_text, 500, 1500);
-    lv_obj_fade_in(underline_text, 500, 1500);
+    lv_obj_t * bar = lv_bar_create(scr_startup);
+    lv_obj_remove_style_all(bar);
+    lv_obj_add_style(bar, &style_bg, 0);
+    lv_obj_add_style(bar, &style_indic, LV_PART_INDICATOR);
+    lv_obj_set_size(bar, 200, 20);
+    lv_obj_align(bar, LV_ALIGN_CENTER, 0, 50);
 
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_var(&a, phelix_text);
-    lv_anim_set_values(&a, lv_obj_get_x(phelix_text), -400);
-    lv_anim_set_time(&a, 500);
-    lv_anim_set_exec_cb(&a, anim_x_cb);
-    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
-    lv_anim_set_delay(&a, 3000);
-    lv_anim_start(&a);
+    lv_obj_fade_in(phelix_text, 100, 500);
+    lv_obj_fade_in(bar, 100, 500);
+
+    lv_anim_t bar_anim;
+    lv_anim_init(&bar_anim);
+    lv_anim_set_var(&bar_anim, bar);
+    lv_anim_set_delay(&bar_anim, 3000);
+
+    lv_bar_set_value(bar, 100, LV_ANIM_ON);
 }
 
 
