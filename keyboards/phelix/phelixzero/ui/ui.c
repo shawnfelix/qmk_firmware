@@ -34,6 +34,9 @@ static lv_obj_t *scr_home;
 lv_obj_t wpm_counter_widget;
 LV_FONT_DECLARE(hooskai_font_36);
 
+lv_obj_t * cont;
+uint8_t current_scroll_pos;
+
 // TODO move this to a config file optional
 void init_theme_colors(void) {
     THEME_ACCENT = lv_color_make(59, 186, 156); // mint green
@@ -49,6 +52,93 @@ void init_theme_colors(void) {
     THEME_BUTTON_3 = lv_color_make(242, 238, 7);
     THEME_BUTTON_4 = lv_color_make(209, 77, 56);
 }
+
+const char* enumToString(wui_t wui_enum) {
+    switch (wui_enum) {
+        case WUI_POMODORO:    return "Pomodoro";
+        case WUI_WPM:         return "WPM";
+        default:              return "Invalid"; // Handle invalid enum value
+    }
+}
+
+static void scroll_event_cb(lv_event_t * e)
+{
+    lv_obj_t * cont_tmp = lv_event_get_target(e);
+
+    lv_area_t cont_a;
+    lv_obj_get_coords(cont_tmp, &cont_a);
+    lv_coord_t cont_y_center = cont_a.y1 + lv_area_get_height(&cont_a) / 2;
+
+    lv_coord_t r = lv_obj_get_height(cont_tmp) * 7 / 4;
+    uint32_t i;
+    uint32_t child_cnt = lv_obj_get_child_cnt(cont_tmp);
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = lv_obj_get_child(cont_tmp, i);
+        lv_area_t child_a;
+        lv_obj_get_coords(child, &child_a);
+
+        lv_coord_t child_y_center = child_a.y1 + lv_area_get_height(&child_a) / 2;
+
+        lv_coord_t diff_y = child_y_center - cont_y_center;
+        diff_y = LV_ABS(diff_y);
+
+        /*Get the x of diff_y on a circle.*/
+        lv_coord_t x;
+        /*If diff_y is out of the circle use the last point of the circle (the radius)*/
+        if(diff_y >= r) {
+            x = r;
+        } else {
+            /*Use Pythagoras theorem to get x from radius and y*/
+            uint32_t x_sqr = r * r - diff_y * diff_y;
+            lv_sqrt_res_t res;
+            lv_sqrt(x_sqr, &res, 0x8000);   /*Use lvgl's built in sqrt root function*/
+            x = res.i - r;
+        }
+
+        /*Translate the item by the calculated X coordinate*/
+        lv_obj_set_style_translate_x(child, x, 0);
+
+        /*Use some opacity with larger translations*/
+        //lv_opa_t opa = lv_map(x, 0, r, LV_OPA_TRANSP, LV_OPA_COVER);
+        //lv_obj_set_style_opa(child, LV_OPA_COVER - opa, 0);
+    }
+}
+
+/**
+ * Translate the object as they scroll
+ */
+void lv_example_scroll_6(void)
+{
+    cont = lv_obj_create(scr_home);
+    lv_obj_set_size(cont, 150, 150);
+    lv_obj_center(cont);
+    lv_obj_align(cont, LV_ALIGN_LEFT_MID, 0, 0);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_add_event_cb(cont, scroll_event_cb, LV_EVENT_SCROLL, NULL);
+    lv_obj_set_style_radius(cont, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_clip_corner(cont, true, 0);
+    lv_obj_set_scroll_dir(cont, LV_DIR_VER);
+    lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
+    lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
+
+    uint32_t i;
+    for(i = 0; i < NumberOfWuiTypes; i++) {
+        lv_obj_t * btn = lv_btn_create(cont);
+        lv_obj_set_width(btn, lv_pct(100));
+
+        lv_obj_t * label = lv_label_create(btn);
+//        lv_label_set_text_fmt(label, "Button %"LV_PRIu32, i);
+        lv_label_set_text(label, enumToString(i));
+    }
+
+    /*Update the buttons position manually for first*/
+    lv_event_send(cont, LV_EVENT_SCROLL, NULL);
+
+    /*Be sure the fist button is in the middle*/
+    lv_obj_scroll_to_view(lv_obj_get_child(cont, 0), LV_ANIM_OFF);
+    current_scroll_pos = 0;
+}
+
 
 
 void init_clock(lv_obj_t *screen, uint32_t time_offset) {
@@ -183,6 +273,24 @@ void ui_btn_event_four(void) {
     //reset_pomodoro();
     init_widget_wpm(scr_home, THEME_TEXT_LIGHT);
 }
+void ui_encoder_up(void) {
+    if (current_scroll_pos > 0) {
+        current_scroll_pos = current_scroll_pos -1;
+        //lv_obj_scroll_to_view(lv_obj_get_child(cont, current_scroll_pos), LV_ANIM_ON);
+        lv_obj_scroll_to_view(lv_obj_get_child(cont, current_scroll_pos), LV_ANIM_ON);
+        //lv_event_send(lv_obj_get_child(cont, current_scroll_pos), LV_EVENT_CLICKED, NULL);
+
+    }
+}
+void ui_encoder_down(void) {
+    if (current_scroll_pos < NumberOfWuiTypes-1) {
+        current_scroll_pos = current_scroll_pos +1;
+        //lv_obj_get_child(cont, current_scroll_pos)
+        //lv_event_send(cont, LV_EVENT_SCROLL, current_scroll_pos+1)
+        lv_obj_scroll_to_view(lv_obj_get_child(cont, current_scroll_pos), LV_ANIM_ON);
+        //lv_event_send(lv_obj_get_child(cont, current_scroll_pos), LV_EVENT_CLICKED, NULL);
+    }
+}
 /*
 example from discord:
 typedef struct {
@@ -225,11 +333,7 @@ void init_ui_layer_state(void) {
     update_layer_state_text();
 }
 
-void read_timer(void) {
-    //int i = 0;
-    //set_label_clock_time(pomo_state.pomodoro, pomopomo_timer);
-    return;
-}
+
 
 void init_screen_home(void) {
     scr_home = lv_obj_create(NULL);
@@ -241,6 +345,7 @@ void init_screen_home(void) {
     init_ui_cli(scr_home);
 
     lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
+    lv_example_scroll_6();
 }
 
 void init_screen_startup(void) {
@@ -258,12 +363,6 @@ void init_screen_startup(void) {
     lv_obj_set_style_text_font(phelix_text, &hooskai_font_36, LV_PART_MAIN);
     lv_obj_align(phelix_text, LV_ALIGN_CENTER, 0, 0);
 
-    /*lv_obj_t *underline_text = lv_label_create(scr_startup);
-    lv_label_set_text(underline_text, "...");
-    lv_obj_set_style_text_color(underline_text, THEME_TEXT_LIGHT, LV_PART_MAIN);
-    lv_obj_set_style_text_font(underline_text, &lv_font_montserrat_38, LV_PART_MAIN);
-    lv_obj_align(underline_text, LV_ALIGN_CENTER, 0, 50);
-    */
     static lv_style_t style_bg;
     static lv_style_t style_indic;
     lv_style_init(&style_bg);
@@ -296,28 +395,6 @@ void init_screen_startup(void) {
     lv_bar_set_value(bar, 100, LV_ANIM_ON);
 }
 
-
-static void set_angle(void* obj, int32_t v) {
-    lv_arc_set_value(obj, v);
-}
-void example_loading_screen(void) {
-    lv_obj_t* arc = lv_arc_create(lv_scr_act());
-    lv_arc_set_rotation(arc, 270);
-    lv_arc_set_bg_angles(arc, 0, 360);
-    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /*Be sure the knob is not displayed*/
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE); /*To not allow adjusting by click*/
-    lv_obj_center(arc);
-
-    static lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_var(&a, arc);
-    lv_anim_set_exec_cb(&a, set_angle);
-    lv_anim_set_time(&a, 1000);
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE); /*Just for the demo*/
-    lv_anim_set_repeat_delay(&a, 500);
-    lv_anim_set_values(&a, 0, 100);
-    lv_anim_start(&a);
-}
 bool init_display(void) {
     display = qp_st7789_make_spi_device(D_PHYSICAL_X, D_PHYSICAL_Y, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
     qp_set_viewport_offsets(display, D_VP_OFFSET_X, D_VP_OFFSET_Y);

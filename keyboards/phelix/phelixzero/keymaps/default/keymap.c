@@ -87,11 +87,20 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 */
 bool encoder_update_user(uint8_t index, bool clockwise) {
     uprintf("[encoder]: %s \n", clockwise ? "CW" : "C_CW");
-    if (clockwise) {
-        tap_code(KC_VOLU);
+    if (IS_LAYER_ON(_UI_CONTROL)) {
+        if (clockwise) {
+            ui_encoder_up();
+        } else {
+            ui_encoder_down();
+        }
     } else {
-        tap_code(KC_VOLD);
+        if (clockwise) {
+            tap_code(KC_VOLU);
+        } else {
+            tap_code(KC_VOLD);
+        }
     }
+
     return false;
     /*if (index == 0) { // First encoder
         if (clockwise) {
