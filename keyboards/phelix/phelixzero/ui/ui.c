@@ -4,11 +4,11 @@
 #include <qp.h>
 #include "qp_lvgl.h"
 #include "qp_st7789.h"
+#include "globals.h"
 #include "features/pomodoro.h"
 #include "features/pk_wpm.h"
 #include "features/ui_cli.h"
 #include "features/features.h"
-#include "ui_state.h"
 
 static const uint16_t D_PHYSICAL_X = 172;
 static const uint16_t D_PHYSICAL_Y = 320;
@@ -155,8 +155,8 @@ void init_clock(lv_obj_t *screen, uint32_t time_offset) {
 
 
 // wui_gbl_state_t stores the state of all WUI widgets
-wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
-gbl_ui_state_t gbl_ui_state;
+//wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
+//gbl_ui_state_t gbl_ui_state;
 //deferred_token pomodoro_timer_start_token;
 
 void set_wui_window_state(wui_t wui_enum, window_state_t state) {

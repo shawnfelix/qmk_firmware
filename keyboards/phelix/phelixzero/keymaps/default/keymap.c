@@ -3,7 +3,6 @@
 
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
-#include "ui/ui_state.h"
 #include "ui/features/ui_cli.h"
 #include "globals.h"
 #include "print.h"

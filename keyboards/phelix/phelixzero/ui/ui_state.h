@@ -1,6 +1,8 @@
 // Copyright 2024 shawnfelix (@shawnfelix)
 // SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
 
+#include "qp_lvgl.h"
 // enum of the WUI widget UI states
 typedef enum { MAX, MIN, HIDDEN } window_state_t;
 /*

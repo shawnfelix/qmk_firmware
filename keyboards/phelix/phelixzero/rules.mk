@@ -18,6 +18,7 @@ VPATH += keyboards/phelix/phelixzero/ui \
 		 keyboards/phelix/phelixzero/ui/features
 
 SRC += ui.c \
+	   globals.c \
 	   pomodoro.c \
 	   pk_wpm.c \
 	   ui_cli.c \
