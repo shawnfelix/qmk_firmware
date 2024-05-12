@@ -3,7 +3,6 @@
 
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
-#include "ui/ui_state.h"
 #include "ui/features/ui_cli.h"
 #include "globals.h"
 #include "print.h"
@@ -40,7 +39,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,     KC_G,               KC_H,   KC_J,  KC_K,    KC_L,   KC_SCLN, KC_QUOT, KC_ENT,
         KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,     KC_B,               KC_N,   KC_M,  KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, KC_UP,     KC_DEL,
         KC_LCTL, KC_LGUI, KC_NO,   KC_LALT, KC_SPC,                       KC_SPC, MO(_UI_CONTROL), KC_RALT, MO(_UI_CONTROL),  KC_LEFT, KC_DOWN, KC_RGHT,
-        KC_NO,                                                            PB_1,   PB_2,  PB_3,    PB_4,   PB_5
+        KC_NO,                                                            PB_1,   PB_2,  PB_3,    PB_4,   PB_5, PB_6
     ),
     /*
     +--------+------+------+------+------+------+------+      +------+------+------+------+------+------+-------------+
@@ -68,12 +67,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     '------'  '-----'-------------   ----------'------'  '------'
     */
     [_UI_CONTROL] = LAYOUT(
-        KC_TILD, KC_NO,   KC_NO,   KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_TILD, PB_5,    PB_6,    KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_NO, UI_J,  UI_K,  UI_L,  KC_NO, KC_NO, KC_NO,
-        KC_NO,   DB_TOGG,   KC_VOLU,   KC_VOLD,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_6, KC_NO, KC_NO, KC_NO,
+        KC_NO,   DB_TOGG,   KC_VOLU,   KC_VOLD,    KC_NO, KC_NO,            KC_NO, UI_M,  UI_N,  KC_NO, PB_5, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   QK_BOOT, KC_NO,    KC_NO,                 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO,                                                      PB_1,   PB_2, PB_3,    PB_4,   PB_5
+        KC_NO,                                                      PB_1,   PB_2, PB_3,    PB_4,   PB_5, PB_6
     )
 };
 
@@ -87,11 +86,20 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 */
 bool encoder_update_user(uint8_t index, bool clockwise) {
     uprintf("[encoder]: %s \n", clockwise ? "CW" : "C_CW");
-    if (clockwise) {
-        tap_code(KC_VOLU);
+    if (IS_LAYER_ON(_UI_CONTROL)) {
+        if (clockwise) {
+            ui_encoder_up();
+        } else {
+            ui_encoder_down();
+        }
     } else {
-        tap_code(KC_VOLD);
+        if (clockwise) {
+            tap_code(KC_VOLU);
+        } else {
+            tap_code(KC_VOLD);
+        }
     }
+
     return false;
     /*if (index == 0) { // First encoder
         if (clockwise) {
@@ -152,9 +160,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         return false;
     }
     switch (keycode) {
-        case PB_6:
-            ui_cli_do_action(CLI_OPEN);
-            return false;
         case PB_1:
             if (record-> event.pressed) {
                 ui_btn_event_one();
@@ -172,13 +177,29 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return false;
         case PB_4:
             if (record-> event.pressed) {
-                ui_btn_event_four();
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    ui_btn_event_four();
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
             }
             return false;
         case PB_5:
             if (record->event.pressed) {
-                uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+                //uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    layer_off(_UI_CONTROL);
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
+                return false;
             }
+            break;
+        case PB_6:
+            if (record->event.pressed) {
+                ui_encoder_switch();
+            }
+            return false;
             break;
         default:
             return true;

@@ -3,7 +3,6 @@
 
 #include <qp.h>
 #include "qp_lvgl.h"
-#include "ui_state.h"
 #include "globals.h"
 #include "features.h"
 
