@@ -162,17 +162,29 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case PB_1:
             if (record-> event.pressed) {
-                ui_btn_event_one();
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    ui_btn_event_one();
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
             }
             return false;
         case PB_2:
             if (record-> event.pressed) {
-                ui_btn_event_two();
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    ui_btn_event_two();
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
             }
             return false;
         case PB_3:
             if (record-> event.pressed) {
-                ui_btn_event_three();
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    ui_btn_event_three();
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
             }
             return false;
         case PB_4:
@@ -186,6 +198,15 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return false;
         case PB_5:
             if (record->event.pressed) {
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    ui_encoder_switch();
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
+            }
+            break;
+        case PB_6:
+            if (record->event.pressed) {
                 //uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
                 if (IS_LAYER_ON(_UI_CONTROL)) {
                     layer_off(_UI_CONTROL);
@@ -193,11 +214,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                     layer_on(_UI_CONTROL);
                 }
                 return false;
-            }
-            break;
-        case PB_6:
-            if (record->event.pressed) {
-                ui_encoder_switch();
             }
             return false;
             break;
