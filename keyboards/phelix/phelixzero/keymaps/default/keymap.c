@@ -3,8 +3,8 @@
 
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
-#include "ui/features/ui_cli.h"
 #include "globals.h"
+#include "features.h"
 #include "print.h"
 #include <debug.h>
 
@@ -67,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     '------'  '-----'-------------   ----------'------'  '------'
     */
     [_UI_CONTROL] = LAYOUT(
-        KC_TILD, PB_5,    PB_6,    KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_TILD, PB_6,    PB_7,    KC_NO,    KC_NO, KC_NO, KC_NO,     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   KC_NO,   UI_UP,   KC_NO,    KC_NO, KC_NO,            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO,   UI_LEFT, UI_DOWN, UI_RIGHT, KC_NO, KC_NO,            KC_LEFT, KC_DOWN,  KC_UP,  KC_RIGHT,  KC_NO, KC_NO, KC_NO,
         KC_NO,   DB_TOGG,   KC_VOLU,   KC_VOLD,    KC_NO, KC_NO,      KC_NO, UI_M,  UI_N,  KC_NO, PB_5, KC_NO, KC_NO, KC_NO,
@@ -88,9 +88,11 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     uprintf("[encoder]: %s \n", clockwise ? "CW" : "C_CW");
     if (IS_LAYER_ON(_UI_CONTROL)) {
         if (clockwise) {
-            ui_encoder_up();
+            ui_btn_event(ENC_CW);
+            //ui_encoder_up();
         } else {
-            ui_encoder_down();
+            ui_btn_event(ENC_CCW);
+            //ui_encoder_down();
         }
     } else {
         if (clockwise) {
@@ -99,23 +101,7 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             tap_code(KC_VOLD);
         }
     }
-
     return false;
-    /*if (index == 0) { // First encoder
-        if (clockwise) {
-            tap_code(KC_PGDN);
-        } else {
-            tap_code(KC_PGUP);
-        }
-    } else if (index == 1) { // Second encoder
-        if (clockwise) {
-            tap_code(KC_PGDN);
-        } else {
-            tap_code(KC_PGUP);
-        }
-    }
-    return false;
-*/
 }
 static bool display_enabled = false;
 void keyboard_post_init_kb(void) {
@@ -132,38 +118,42 @@ const char keycode_to_char_lookup_2[] = {
     // Add more characters as needed
 };
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    if (gbl_ui_state.cli_mode_active == true && record-> event.pressed) {
+    /*if (gbl_ui_state.cli_mode_active == true && record-> event.pressed) {
         uprintf("[UI CLI MODE] Keycode: 0x%04X\n", keycode);
         switch(keycode) {
             case QK_GESC:
-                ui_cli_do_action(CLI_CLOSE);
+                //ui_cli_do_action(CLI_CLOSE);
                 return false;
             break;
             case KC_ENT:
-                ui_cli_do_action(CLI_SUBMIT);
+                //ui_cli_do_action(CLI_SUBMIT);
                 return false;
             break;
             case KC_BSPC:
-                ui_cli_do_action(CLI_BSPC);
+                //ui_cli_do_action(CLI_BSPC);
                 return false;
             break;
             case KC_LEFT:
-                ui_cli_do_action(CLI_LEFT);
+                //ui_cli_do_action(CLI_LEFT);
                 return false;
             case KC_RIGHT:
-                ui_cli_do_action(CLI_RIGHT);
+                //ui_cli_do_action(CLI_RIGHT);
                 return false;
             default:
-                lv_textarea_add_char(gbl_ui_state.cli_ta, keycode_to_char_lookup_2[keycode]);
+                //lv_textarea_add_char(gbl_ui_state.cli_ta, keycode_to_char_lookup_2[keycode]);
             break;
         }
         return false;
+    }*/
+    println("");
+    if (record->event.pressed) {
+        uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
     }
     switch (keycode) {
         case PB_1:
             if (record-> event.pressed) {
                 if (IS_LAYER_ON(_UI_CONTROL)) {
-                    ui_btn_event_one();
+                    ui_btn_event(B1);
                 } else {
                     layer_on(_UI_CONTROL);
                 }
@@ -172,7 +162,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         case PB_2:
             if (record-> event.pressed) {
                 if (IS_LAYER_ON(_UI_CONTROL)) {
-                    ui_btn_event_two();
+                    ui_btn_event(B2);
                 } else {
                     layer_on(_UI_CONTROL);
                 }
@@ -181,7 +171,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         case PB_3:
             if (record-> event.pressed) {
                 if (IS_LAYER_ON(_UI_CONTROL)) {
-                    ui_btn_event_three();
+                    ui_btn_event(B3);
                 } else {
                     layer_on(_UI_CONTROL);
                 }
@@ -190,7 +180,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         case PB_4:
             if (record-> event.pressed) {
                 if (IS_LAYER_ON(_UI_CONTROL)) {
-                    ui_btn_event_four();
+                    ui_btn_event(B4);
                 } else {
                     layer_on(_UI_CONTROL);
                 }
@@ -198,16 +188,34 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return false;
         case PB_5:
             if (record->event.pressed) {
+                println("pb5outside");
                 if (IS_LAYER_ON(_UI_CONTROL)) {
-                    ui_encoder_switch();
+                    println("pb5inside\n");
+                    ui_btn_event(ENC_BTN);
+                    //ui_encoder_switch();
                 } else {
+                    println("pb5inside22\n");
                     layer_on(_UI_CONTROL);
                 }
             }
             break;
         case PB_6:
             if (record->event.pressed) {
+                println("pb6\n");
                 //uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+                if (IS_LAYER_ON(_UI_CONTROL)) {
+                    ui_btn_event(B5);
+                    //layer_off(_UI_CONTROL);
+                } else {
+                    layer_on(_UI_CONTROL);
+                }
+                return false;
+            }
+            return false;
+            break;
+        case PB_7:
+            if (record->event.pressed) {
+                println("pb7\n");
                 if (IS_LAYER_ON(_UI_CONTROL)) {
                     layer_off(_UI_CONTROL);
                 } else {

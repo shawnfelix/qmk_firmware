@@ -3,6 +3,10 @@
 
 #ifndef UI_CLI_H
 #define UI_CLI_H
+
+#include "pomodoro.h"
+#include "pk_wpm.h"
+
 typedef enum {
     CLI_OPEN,
     CLI_CLOSE,
@@ -12,5 +16,6 @@ typedef enum {
     CLI_LEFT,
     CLI_RIGHT
 } cli_action_t;
+
 
 #endif
