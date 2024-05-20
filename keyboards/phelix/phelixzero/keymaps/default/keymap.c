@@ -118,7 +118,7 @@ const char keycode_to_char_lookup_2[] = {
     // Add more characters as needed
 };
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    /*if (gbl_ui_state.cli_mode_active == true && record-> event.pressed) {
+    if (gbl_ui_state.cli_mode_active == true && record-> event.pressed) {
         uprintf("[UI CLI MODE] Keycode: 0x%04X\n", keycode);
         switch(keycode) {
             case QK_GESC:
@@ -144,11 +144,11 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             break;
         }
         return false;
-    }*/
-    println("");
-    if (record->event.pressed) {
+    }
+    /*if (record->event.pressed) {
         uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
     }
+    */
     switch (keycode) {
         case PB_1:
             if (record-> event.pressed) {
@@ -188,20 +188,16 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return false;
         case PB_5:
             if (record->event.pressed) {
-                println("pb5outside");
                 if (IS_LAYER_ON(_UI_CONTROL)) {
-                    println("pb5inside\n");
                     ui_btn_event(ENC_BTN);
                     //ui_encoder_switch();
                 } else {
-                    println("pb5inside22\n");
                     layer_on(_UI_CONTROL);
                 }
             }
             break;
         case PB_6:
             if (record->event.pressed) {
-                println("pb6\n");
                 //uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
                 if (IS_LAYER_ON(_UI_CONTROL)) {
                     ui_btn_event(B5);
@@ -215,7 +211,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             break;
         case PB_7:
             if (record->event.pressed) {
-                println("pb7\n");
                 if (IS_LAYER_ON(_UI_CONTROL)) {
                     layer_off(_UI_CONTROL);
                 } else {
