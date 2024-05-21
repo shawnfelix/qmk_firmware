@@ -15,13 +15,16 @@ WPM_ENABLE = yes
 EXTRAKEY_ENABLE = yes #enable media controls
 
 VPATH += keyboards/phelix/phelixzero/ui \
-		 keyboards/phelix/phelixzero/ui/features
+		 keyboards/phelix/phelixzero/ui/features \
+		 keyboards/phelix/phelixzero/ui/native
 
-SRC += ui.c \
-	   globals.c \
+SRC += globals.c \
 	   pomodoro.c \
 	   pk_wpm.c \
-	   ui_cli.c \
+	   ui/native/ui_cli.c \
+	   ui/native/scroll_selector.c \
+	   ui/native/native.c \
+	   ui.c \
        ui/fonts/hooskai_font_36.c
 
 

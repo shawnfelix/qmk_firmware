@@ -5,9 +5,7 @@
 #include "qp_lvgl.h"
 #include "qp_st7789.h"
 #include "globals.h"
-#include "features/pomodoro.h"
-#include "features/pk_wpm.h"
-#include "features/ui_cli.h"
+#include "native/native.h"
 #include "features/features.h"
 
 static const uint16_t D_PHYSICAL_X = 172;
@@ -30,12 +28,9 @@ lv_color_t THEME_BUTTON_3;
 lv_color_t THEME_BUTTON_4;
 
 static lv_obj_t *scr_startup;
-static lv_obj_t *scr_home;
 lv_obj_t wpm_counter_widget;
 LV_FONT_DECLARE(hooskai_font_36);
 
-lv_obj_t * cont;
-uint8_t current_scroll_pos;
 
 // TODO move this to a config file optional
 void init_theme_colors(void) {
@@ -53,97 +48,6 @@ void init_theme_colors(void) {
     THEME_BUTTON_4 = lv_color_make(209, 77, 56);
 }
 
-const char* enumToString(wui_t wui_enum) {
-    switch (wui_enum) {
-        case WUI_POMODORO:    return "Pomodoro";
-        case WUI_WPM:         return "WPM";
-        default:              return "Invalid"; // Handle invalid enum value
-    }
-}
-
-static void scroll_event_cb(lv_event_t * e)
-{
-    lv_obj_t * cont_tmp = lv_event_get_target(e);
-
-    lv_area_t cont_a;
-    lv_obj_get_coords(cont_tmp, &cont_a);
-    lv_coord_t cont_y_center = cont_a.y1 + lv_area_get_height(&cont_a) / 2;
-
-    lv_coord_t r = lv_obj_get_height(cont_tmp) * 7 / 4;
-    uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(cont_tmp);
-    for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = lv_obj_get_child(cont_tmp, i);
-        lv_area_t child_a;
-        lv_obj_get_coords(child, &child_a);
-
-        lv_coord_t child_y_center = child_a.y1 + lv_area_get_height(&child_a) / 2;
-
-        lv_coord_t diff_y = child_y_center - cont_y_center;
-        diff_y = LV_ABS(diff_y);
-
-        /*Get the x of diff_y on a circle.*/
-        lv_coord_t x;
-        /*If diff_y is out of the circle use the last point of the circle (the radius)*/
-        if(diff_y >= r) {
-            x = r;
-        } else {
-            /*Use Pythagoras theorem to get x from radius and y*/
-            uint32_t x_sqr = r * r - diff_y * diff_y;
-            lv_sqrt_res_t res;
-            lv_sqrt(x_sqr, &res, 0x8000);   /*Use lvgl's built in sqrt root function*/
-            x = res.i - r;
-        }
-
-        /*Translate the item by the calculated X coordinate*/
-        lv_obj_set_style_translate_x(child, x, 0);
-
-        /*Use some opacity with larger translations*/
-        //lv_opa_t opa = lv_map(x, 0, r, LV_OPA_TRANSP, LV_OPA_COVER);
-        //lv_obj_set_style_opa(child, LV_OPA_COVER - opa, 0);
-    }
-}
-
-/**
- * Translate the object as they scroll
- */
-void show_ui_widget_selector(void)
-{
-    cont = lv_obj_create(scr_home);
-    lv_obj_set_size(cont, 172, 150);
-    lv_obj_set_style_bg_opa(cont, 0, 0);
-    lv_obj_set_style_border_width(cont, 0, 0);
-    lv_obj_center(cont);
-    lv_obj_align(cont, LV_ALIGN_LEFT_MID, 0, 0);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
-    lv_obj_add_event_cb(cont, scroll_event_cb, LV_EVENT_SCROLL, NULL);
-    //lv_obj_set_style_radius(cont, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_clip_corner(cont, true, 0);
-    lv_obj_set_scroll_dir(cont, LV_DIR_VER);
-    lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
-    lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
-
-    uint32_t i;
-    for(i = 0; i < NumberOfWuiTypes; i++) {
-        lv_obj_t * btn = lv_btn_create(cont);
-        lv_obj_set_width(btn, lv_pct(100));
-        lv_obj_set_style_bg_color(btn, THEME_TEXT_DARK, 0);
-
-        lv_obj_t * label = lv_label_create(btn);
-//        lv_label_set_text_fmt(label, "Button %"LV_PRIu32, i);
-        lv_label_set_text(label, enumToString(i));
-    }
-
-    /*Update the buttons position manually for first*/
-    lv_event_send(cont, LV_EVENT_SCROLL, NULL);
-
-    /*Be sure the fist button is in the middle*/
-    lv_obj_scroll_to_view(lv_obj_get_child(cont, 0), LV_ANIM_OFF);
-    current_scroll_pos = 0;
-}
-
-
-
 void init_clock(lv_obj_t *screen, uint32_t time_offset) {
     lv_obj_t *clock = lv_label_create(scr_home);
     lv_label_set_text(clock, "12:48PM");
@@ -153,39 +57,6 @@ void init_clock(lv_obj_t *screen, uint32_t time_offset) {
     lv_obj_fade_in(clock, 400, time_offset + 1000);
 }
 
-
-// wui_gbl_state_t stores the state of all WUI widgets
-//wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
-//gbl_ui_state_t gbl_ui_state;
-//deferred_token pomodoro_timer_start_token;
-
-void set_wui_window_state(wui_t wui_enum, window_state_t state) {
-    wui_gbl_state[wui_enum].window_state = state;
-}
-void set_gbl_wui(wui_t wui_enum, window_state_t init_state, window_state_t ui_state) {
-    set_wui_window_state(wui_enum, ui_state);
-}
-
-/*
-    Runs one time on keyboard startup to init global state
-    and enable all of the widgets
-*/
-void init_firmware_enabled_widgets_all(void) {
-    // init global state
-    gbl_ui_state = (gbl_ui_state_t) { .active_layer_text="uninitialized", NULL, false, ""};
-    // init the list of enabled wuis and get the count
-    // create an array of wui_gbl_state_t for each enabled wui
-    // create map where:
-    //      key = enum value of the widget
-    //      value = address of the wui element in the array
-    // store the states as wui_gbl_state_t
-
-    //pomo_wui_state_t pomo_state = (pomo_wui_state_t) { .init = false, .pomo_timer = 0, .pomodoro_state = 0 };
-    //wui_gbl_state[WUI_POMODORO] = (wui_gbl_state_t) { .wui_init_state = NOT_INIT, .wui_ui_state = HIDDEN, .pomo_wui_state = pomo_state };
-}
-
-void init_ui(void) {
-}
 /*
 void set_label_clock_time(lv_obj_t *label, uint32_t curr_time) {
     uint32_t hours = curr_time / 3600;
@@ -193,9 +64,8 @@ void set_label_clock_time(lv_obj_t *label, uint32_t curr_time) {
     uint32_t secs = curr_time % 60;
     lv_label_set_text_fmt(label, "%02ld:%02ld:%02ld", hours, mins, secs);
     //lv_label_set_text_fmt(pomodoro, "%ld", curr_time);
-}*/
+}
 
-/*
 void update(void) {
     set_label_clock_time(pomodoro, pomo_timer);
 }
@@ -255,45 +125,31 @@ void init_ui_action_button_bar(void) {
 
 }
 
-/* OK, Yes, or Continue button in the UI. Affirmative ui event */
+void ui_btn_event(wui_btn_t btn) {
+    println("ui.c calling routing ------");
+    btn_event_router(btn);
+}
+/*
 void ui_btn_event_one(void) {
     init_widget_pomodoro(scr_home, THEME_TEXT_LIGHT);
 }
-/* Up or Alt Modifier 1 button in the UI */
+
 void ui_btn_event_two(void) {
-    pause_pomodoro();
+    //pause_pomodoro();
+    init_ui_cli(scr_home);
 }
-/* Down or Alt M button in the UI */
+
 void ui_btn_event_three(void) {
     start_pomodoro();
 }
-/* Cancel, Back, or No button in the UI. Negative action */
+
 void ui_btn_event_four(void) {
     //reset_pomodoro();
     init_widget_wpm(scr_home, THEME_TEXT_LIGHT);
 }
 void ui_encoder_switch(void) {
-    show_ui_widget_selector();
+    init_ui_widget_selector();
 }
-void ui_encoder_up(void) {
-    if (current_scroll_pos > 0) {
-        current_scroll_pos = current_scroll_pos -1;
-        //lv_obj_scroll_to_view(lv_obj_get_child(cont, current_scroll_pos), LV_ANIM_ON);
-        lv_obj_scroll_to_view(lv_obj_get_child(cont, current_scroll_pos), LV_ANIM_ON);
-        //lv_event_send(lv_obj_get_child(cont, current_scroll_pos), LV_EVENT_CLICKED, NULL);
-
-    }
-}
-void ui_encoder_down(void) {
-    if (current_scroll_pos < NumberOfWuiTypes-1) {
-        current_scroll_pos = current_scroll_pos +1;
-        //lv_obj_get_child(cont, current_scroll_pos)
-        //lv_event_send(cont, LV_EVENT_SCROLL, current_scroll_pos+1)
-        lv_obj_scroll_to_view(lv_obj_get_child(cont, current_scroll_pos), LV_ANIM_ON);
-        //lv_event_send(lv_obj_get_child(cont, current_scroll_pos), LV_EVENT_CLICKED, NULL);
-    }
-}
-/*
 example from discord:
 typedef struct {
     painter_device_t device;
@@ -336,7 +192,6 @@ void init_ui_layer_state(void) {
 }
 
 
-
 void init_screen_home(void) {
     scr_home = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(scr_home, THEME_PRIMARY_BG, LV_PART_MAIN);
@@ -344,7 +199,8 @@ void init_screen_home(void) {
     init_clock(scr_home, 3500);
     init_ui_action_button_bar();
     init_ui_layer_state();
-    init_ui_cli(scr_home);
+    init_native_ui_elements();
+    init_all_wuis();
 
     lv_scr_load_anim(scr_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 3000, false);
 }
@@ -396,6 +252,14 @@ void init_screen_startup(void) {
     lv_bar_set_value(bar, 100, LV_ANIM_ON);
 }
 
+/* initialize the ui variables and start the UI. Runs once on startup */
+void init_ui(void) {
+    init_global_ui_state();
+    init_theme_colors();
+    init_screen_startup();
+    init_screen_home();
+}
+
 bool init_display(void) {
     display = qp_st7789_make_spi_device(D_PHYSICAL_X, D_PHYSICAL_Y, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
     qp_set_viewport_offsets(display, D_VP_OFFSET_X, D_VP_OFFSET_Y);
@@ -403,9 +267,6 @@ bool init_display(void) {
 
     if (qp_lvgl_attach(display)) {
         init_ui();
-        init_theme_colors();
-        init_screen_startup();
-        init_screen_home();
     }
     return true;
 }

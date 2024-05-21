@@ -2,3 +2,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 void init_widget_wpm(lv_obj_t *scr_home, lv_color_t text_color);
+
+void ui_btn_action_wpm(wui_btn_t btn);
