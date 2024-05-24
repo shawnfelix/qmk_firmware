@@ -3,61 +3,40 @@
 #pragma once
 
 #include "qp_lvgl.h"
+#include <features.h>
+#include "globals.h"
 #include <controls.h>
-// enum of the WUI widget UI states
-typedef enum { MAX, MIN, HIDDEN } window_state_t;
-/*
-enum of all WUI widget program states
-state transitions: NOT_INIT -> INIT -> IDLE <-> RUNNING
+#include "native.h"
+#include "common_types.h"
+
+#define MAX_WUI_OBSERVERS 10
+
+
+//typedef void (*update_func)(struct obser);
+/*typedef struct {
+    wui_gbl_state_t *wui_gbl_state_ptr;
+} wui_observer;
+
+typedef struct {
+    wui_observer *observers[MAX_WUI_OBSERVERS];
+    uint8_t num_observers;
+} wui_subject;
 */
-typedef enum { NOT_INIT, INIT, IDLE, RUNNING } wui_init_state_t;
 
-// enum of all WUI widgets that are developed for phelix keyboards
-typedef enum {
-    WUI_POMODORO,
-    WUI_WPM,
-    NumberOfWuiTypes
-} wui_t;
+void init_global_ui_state(void);
+lv_obj_t *init_screen_home(void);
 
-typedef struct {
-    char active_layer_text[20];
-    lv_obj_t *active_layer_obj;
-    bool cli_mode_active;
-    bool widget_selector_mode_active;
-    wui_t curr_active_wui;
-    char cli_buffer[100];
-    lv_obj_t *cli_ta;
-} gbl_ui_state_t;
 
-typedef enum {
-    POMO_RUNNING,
-    POMO_PAUSED,
-    POMO_STOPPED
-} pomo_state_t;
+wui_gbl_state_t *get_wui(wui_t wui);
+wui_gbl_state_t *get_active_wui(void);
+gbl_ui_state_t *get_gbl_state(void);
 
-typedef struct {
-    window_state_t ui_state;
-    uint32_t pomo_timer;
-    pomo_state_t pomo_state;
-    lv_obj_t *pomo_label;
-    deferred_token token;
-} pomo_wui_state_t;
+void register_observer(void);
+void unregister_observer(void);
+void notify_observers(void);
+void maximize_wui(wui_t wui);
+void show_menu(void);
 
-typedef struct {
-    uint8_t last_wpm;
-    lv_obj_t *wpm_label;
-    deferred_token token;
-} wpm_wui_state_t;
 
-// wrapper common type for the state of a WUI widget,
-typedef struct {
-    wui_init_state_t wui_init_state;
-    window_state_t window_state;
-    void (*fun_btn_event) (wui_btn_t btn);
-    union {
-        // add other widgets here
-        pomo_wui_state_t pomo_wui_state;
-        wpm_wui_state_t wpm_wui_state;
-    };
-} wui_gbl_state_t;
+
 

@@ -4,7 +4,6 @@
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
 #include "globals.h"
-#include "features.h"
 #include "print.h"
 #include <debug.h>
 
@@ -118,7 +117,7 @@ const char keycode_to_char_lookup_2[] = {
     // Add more characters as needed
 };
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    if (gbl_ui_state.cli_mode_active == true && record-> event.pressed) {
+    if (get_gbl_state()->cli_mode_active == true && record-> event.pressed) {
         uprintf("[UI CLI MODE] Keycode: 0x%04X\n", keycode);
         switch(keycode) {
             case QK_GESC:

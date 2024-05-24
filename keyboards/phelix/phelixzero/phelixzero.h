@@ -4,7 +4,6 @@
 #pragma once
 
 #include <quantum.h>
-#include "ui/ui.h"
 
 enum phelix_keycodes {
     UI_UP = SAFE_RANGE,
