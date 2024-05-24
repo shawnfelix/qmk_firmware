@@ -1,6 +1,7 @@
 // Copyright 2024 shawnfelix (@shawnfelix)
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+
 #include "controls.h"
 #include "qp_lvgl.h"
 
@@ -22,7 +23,7 @@ void start_pomodoro(void);
 void reset_pomodoro(void);
 void pause_pomodoro(void);
 
-void init_widget_pomodoro(void);
+void init_widget_pomodoro(lv_obj_t *screen);
 
 void ui_show_pomodoro(void);
 void ui_hide_pomodoro(void);

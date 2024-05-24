@@ -15,7 +15,7 @@ typedef struct {
     };
 } native_state_t;
 
-void init_native_ui_elements(void);
+void init_native_ui_elements(lv_obj_t *screen);
 
 void toggle_native_elements_visibility(void);
 void native_btn_event_router(wui_btn_t btn);

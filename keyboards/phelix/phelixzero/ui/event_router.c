@@ -12,12 +12,12 @@ void route_btn_event(wui_btn_t btn) {
     }
 
     // TODO replace this check with a global UI mode (native vs wui/child)
-    if (gbl_ui_state.widget_selector_mode_active == true) {
+    if (get_gbl_state()->widget_selector_mode_active == true) {
         // if the widget selector is open
         println("global router with widget selector mode");
         native_btn_event_router(btn);
     } else {
         // TODO wui btn event router
-        wui_gbl_state[gbl_ui_state.curr_active_wui].fun_btn_event(btn);
+        get_active_wui()->fun_btn_event(btn);
     }
 }

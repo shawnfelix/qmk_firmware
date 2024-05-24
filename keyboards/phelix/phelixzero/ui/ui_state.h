@@ -10,20 +10,7 @@
 #include "common_types.h"
 
 #define MAX_WUI_OBSERVERS 10
-typedef struct {
-    char active_layer_text[20];
-    lv_obj_t *active_layer_obj;
-    char cli_buffer[100];
-    bool cli_mode_active;
-    bool widget_selector_mode_active;
-    wui_t curr_active_wui;
-    lv_obj_t *cli_ta;
 
-    bool native_comp_active;
-    bool wui_comp_active;
-    wui_t active_wui; // for btn routing
-    native_t active_native; // for btn routing
-} gbl_ui_state_t;
 
 //typedef void (*update_func)(struct obser);
 /*typedef struct {
@@ -38,6 +25,12 @@ typedef struct {
 
 void init_global_ui_state(void);
 lv_obj_t *init_screen_home(void);
+
+
+wui_gbl_state_t *get_wui(wui_t wui);
+wui_gbl_state_t *get_active_wui(void);
+gbl_ui_state_t *get_gbl_state(void);
+
 void register_observer(void);
 void unregister_observer(void);
 void notify_observers(void);

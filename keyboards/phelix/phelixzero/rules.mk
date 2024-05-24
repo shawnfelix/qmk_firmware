@@ -18,14 +18,16 @@ VPATH += keyboards/phelix/phelixzero/ui \
 		 keyboards/phelix/phelixzero/ui/features \
 		 keyboards/phelix/phelixzero/ui/native
 
-SRC += globals.c \
+SRC += ui.c \
+	   ui_state.c \
+	   globals.c \
 	   pomodoro.c \
 	   pk_wpm.c \
+	   theme.c \
 	   ui/event_router.c \
 	   ui/native/ui_cli.c \
 	   ui/native/scroll_selector.c \
 	   ui/native/native.c \
-	   ui.c \
        ui/fonts/hooskai_font_36.c
 
 

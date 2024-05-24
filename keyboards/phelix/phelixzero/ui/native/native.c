@@ -9,36 +9,31 @@
 extern uint8_t current_scroll_pos;
 
 void update_layer_state_text(void) {
-    if (gbl_ui_state.active_layer_obj != NULL) {
-        lv_label_set_text_fmt(gbl_ui_state.active_layer_obj, "Layer: %s", gbl_ui_state.active_layer_text);
+    if (get_gbl_state()->active_layer_obj != NULL) {
+        lv_label_set_text_fmt(get_gbl_state()->active_layer_obj, "Layer: %s", get_gbl_state()->active_layer_text);
     }
 }
 void update_ui_layer_state(char layer_name_text[]) {
-    strcpy(gbl_ui_state.active_layer_text, layer_name_text);
+    strcpy(get_gbl_state()->active_layer_text, layer_name_text);
     update_layer_state_text();
 }
 void init_ui_layer_state(lv_obj_t *screen) {
-    gbl_ui_state.active_layer_obj = lv_label_create(screen);
-    lv_obj_set_style_text_color(gbl_ui_state.active_layer_obj, THEME_TEXT_LIGHT, LV_PART_MAIN);
-    lv_obj_set_style_text_font(gbl_ui_state.active_layer_obj, &lv_font_montserrat_14, LV_PART_MAIN);
-    lv_obj_align(gbl_ui_state.active_layer_obj, LV_ALIGN_TOP_LEFT, 10, 5);
+    get_gbl_state()->active_layer_obj = lv_label_create(screen);
+    lv_obj_set_style_text_color(get_gbl_state()->active_layer_obj, THEME_TEXT_LIGHT, LV_PART_MAIN);
+    lv_obj_set_style_text_font(get_gbl_state()->active_layer_obj, &lv_font_montserrat_14, LV_PART_MAIN);
+    lv_obj_align(get_gbl_state()->active_layer_obj, LV_ALIGN_TOP_LEFT, 10, 5);
     update_layer_state_text();
 }
 
-void init_native_ui_elements(lv_obj_t *screen) {
-    init_ui_cli(screen);
-    init_ui_widget_selector(screen, NumberOfWuiTypes);
-    gbl_ui_state.widget_selector_mode_active = false;
-}
 
 void toggle_widget_selector(void) {
-    if (gbl_ui_state.widget_selector_mode_active == true) {
+    if (get_gbl_state()->widget_selector_mode_active == true) {
         println("toggle");
         hide_widget_selector();
-        gbl_ui_state.widget_selector_mode_active = false;
+        get_gbl_state()->widget_selector_mode_active = false;
     } else {
         show_widget_selector();
-        gbl_ui_state.widget_selector_mode_active = true;
+        get_gbl_state()->widget_selector_mode_active = true;
     }
 }
 
@@ -48,7 +43,7 @@ void toggle_native_elements_visibility(void) {
 }
 void native_btn_event_router(wui_btn_t btn) {
     uprintf("native_btn_event_router(): %d\n", btn);
-    if (gbl_ui_state.widget_selector_mode_active == true) {
+    if (get_gbl_state()->widget_selector_mode_active == true) {
         switch(ui_btn_event_scroll_selector(btn)) {
             case N_CLOSE: toggle_native_elements_visibility();
             break;
@@ -120,4 +115,13 @@ void init_clock(lv_obj_t *screen, uint32_t time_offset) {
     lv_obj_set_style_text_font(clock, &lv_font_montserrat_30, LV_PART_MAIN);
     lv_obj_align(clock, LV_ALIGN_TOP_RIGHT, -5, 5);
     lv_obj_fade_in(clock, 400, time_offset + 1000);
+}
+
+void init_native_ui_elements(lv_obj_t *screen) {
+    init_ui_cli(screen);
+    init_ui_widget_selector(screen, NumberOfWuiTypes);
+    init_ui_action_button_bar(screen);
+    init_ui_layer_state(screen);
+    init_clock(screen, 1000);
+    get_gbl_state()->widget_selector_mode_active = false;
 }

@@ -7,9 +7,9 @@
 #include "common_types.h"
 #include "features.h"
 
-extern wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
-extern native_t n_gbl_state[NumberOfNativeComponents];
-extern gbl_ui_state_t gbl_ui_state;
+//wui_gbl_state_t wui_gbl_state[NumberOfWuiTypes];
+//native_t n_gbl_state[NumberOfNativeComponents];
+//gbl_ui_state_t gbl_ui_state;
 
 const char* enumToString(wui_t wui_enum);
 
