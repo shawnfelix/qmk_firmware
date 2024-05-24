@@ -4,7 +4,6 @@
 #include QMK_KEYBOARD_H
 #include "ui/ui.h"
 #include "globals.h"
-#include "features.h"
 #include "print.h"
 #include <debug.h>
 

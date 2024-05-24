@@ -16,7 +16,7 @@ uint32_t update_wpm_callback(uint32_t trig, void *cb_arg) {
     return 200;
 }
 
-void init_widget_wpm(lv_obj_t *scr_home, lv_color_t text_color) {
+void init_widget_wpm(lv_obj_t *screen, lv_color_t text_color) {
     if (wui_gbl_state[WUI_WPM].wui_init_state == NOT_INIT) {
         // init wpm wui state in global context
         wui_gbl_state[WUI_WPM].wpm_wui_state = (wpm_wui_state_t){
@@ -25,7 +25,7 @@ void init_widget_wpm(lv_obj_t *scr_home, lv_color_t text_color) {
             };
         wui_gbl_state[WUI_WPM].wui_init_state = INIT;
         // init ui stuff
-        wui_gbl_state[WUI_WPM].wpm_wui_state.wpm_label = lv_label_create(scr_home);
+        wui_gbl_state[WUI_WPM].wpm_wui_state.wpm_label = lv_label_create(screen);
         lv_label_set_text_fmt(wui_gbl_state[WUI_WPM].wpm_wui_state.wpm_label, "%02d WPM", 0);
         lv_obj_set_style_text_color(wui_gbl_state[WUI_WPM].wpm_wui_state.wpm_label, text_color, LV_PART_MAIN);
         lv_obj_set_style_text_font(wui_gbl_state[WUI_WPM].wpm_wui_state.wpm_label, &lv_font_montserrat_38, LV_PART_MAIN);

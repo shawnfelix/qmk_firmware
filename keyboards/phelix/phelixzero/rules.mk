@@ -21,6 +21,7 @@ VPATH += keyboards/phelix/phelixzero/ui \
 SRC += globals.c \
 	   pomodoro.c \
 	   pk_wpm.c \
+	   ui/event_router.c \
 	   ui/native/ui_cli.c \
 	   ui/native/scroll_selector.c \
 	   ui/native/native.c \
