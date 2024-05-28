@@ -7,6 +7,7 @@
 
 static lv_obj_t * cont;
 static uint8_t current_scroll_pos;
+static lv_obj_t *exit_wui_btn;
 
 /**
  * Translate the object as they scroll
@@ -78,6 +79,13 @@ void init_ui_widget_selector(lv_obj_t * screen, uint32_t number_of_init_wuis) {
         lv_label_set_text(label, enumToString(i));
     }
 
+    exit_wui_btn = lv_btn_create(cont);
+    lv_obj_set_width(exit_wui_btn, lv_pct(100));
+    lv_obj_set_style_bg_color(exit_wui_btn, lv_color_make(50, 119, 147), 0);
+
+    lv_obj_t * label = lv_label_create(exit_wui_btn);
+    lv_label_set_text(label, "exit");
+
     /*Update the buttons position manually for first*/
     lv_event_send(cont, LV_EVENT_SCROLL, NULL);
 
@@ -97,7 +105,7 @@ void scroll_up(void) {
     }
 }
 void scroll_down(void) {
-    if (current_scroll_pos < NumberOfWuiTypes-1) {
+    if (current_scroll_pos < NumberOfWuiTypes) {
         current_scroll_pos = current_scroll_pos +1;
         //lv_obj_get_child(cont, current_scroll_pos)
         //lv_event_send(cont, LV_EVENT_SCROLL, current_scroll_pos+1)
@@ -107,6 +115,10 @@ void scroll_down(void) {
 }
 
 void open_widget_at_pos(void) {
+    if (current_scroll_pos == NumberOfWuiTypes) {
+        // exit button
+        minimize_active_wui();
+    }
     set_wui_window_state(current_scroll_pos, MAX);
 }
 
