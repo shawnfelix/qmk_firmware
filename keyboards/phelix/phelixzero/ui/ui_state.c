@@ -37,6 +37,9 @@ wui_gbl_state_t *get_active_wui(void) {
 gbl_ui_state_t *get_gbl_state(void) {
     return &gbl_ui_state;
 }
+wui_t get_active_wui_type(void) {
+    return gbl_ui_state.curr_active_wui;
+}
 // TODO observer pattern
 void set_wui_window_state(wui_t wui_enum, window_state_t state) {
     wui_gbl_state[wui_enum].window_state = state;
@@ -45,6 +48,7 @@ void set_wui_window_state(wui_t wui_enum, window_state_t state) {
             case MAX:
                 println("MAX ---");
                 ui_show_pomodoro();
+                gbl_ui_state.active_wui = WUI_POMODORO;
                 ////lv_obj_add_flag(wui_gbl_state[wui_enum].pomo_wui_state.pomo_label,LV_OBJ_FLAG_HIDDEN);
                 break;
             case HIDDEN:
@@ -94,6 +98,13 @@ void notify_observers(void) {
 }
 
 void maximize_wui(wui_t wui) {
+
+}
+void minimize_wui(wui_t wui) {
+    set_wui_window_state(wui, HIDDEN);
+}
+void minimize_active_wui(void) {
+    minimize_wui(get_active_wui_type());
 
 }
 

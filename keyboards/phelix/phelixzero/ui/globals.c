@@ -22,7 +22,4 @@ const char* enumToString(wui_t wui_enum) {
 void set_gbl_wui(wui_t wui_enum, window_state_t init_state, window_state_t ui_state) {
     set_wui_window_state(wui_enum, ui_state);
 }
-void minimize_wui(wui_t wui_enum) {
-
-}
 

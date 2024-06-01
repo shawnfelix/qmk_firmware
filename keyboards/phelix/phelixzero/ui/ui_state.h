@@ -30,11 +30,14 @@ lv_obj_t *init_screen_home(void);
 wui_gbl_state_t *get_wui(wui_t wui);
 wui_gbl_state_t *get_active_wui(void);
 gbl_ui_state_t *get_gbl_state(void);
+wui_t get_active_wui_type(void);
 
 void register_observer(void);
 void unregister_observer(void);
 void notify_observers(void);
 void maximize_wui(wui_t wui);
+void minimize_wui(wui_t wui);
+void minimize_active_wui(void);
 void show_menu(void);
 
 
